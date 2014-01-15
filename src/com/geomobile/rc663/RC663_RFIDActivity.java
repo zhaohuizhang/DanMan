@@ -15,22 +15,28 @@ public class RC663_RFIDActivity extends Activity implements OnClickListener {
 	private Button start_15693;	private Button start_2ndGID;
 	private Button start_ultralight;
 	private Button start_scan;
+	private Button start_scan2;
+	private Button start_scan3;
 	
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
         
-        start_mifare = (Button)findViewById(R.id.button_mifare);
-        start_15693 = (Button)findViewById(R.id.button_15693);
-        start_2ndGID = (Button)findViewById(R.id.button_2ndGID);
-        start_ultralight=(Button)findViewById(R.id.button_ultralight);
-        start_scan=(Button)findViewById(R.id.button_ScanAndUpload);
-        start_mifare.setOnClickListener(this);
-        start_15693.setOnClickListener(this);
-        start_2ndGID.setOnClickListener(this);
-        start_ultralight.setOnClickListener(this);
+        //start_mifare = (Button)findViewById(R.id.button_mifare);
+        //start_15693 = (Button)findViewById(R.id.button_15693);
+        //start_2ndGID = (Button)findViewById(R.id.button_2ndGID);
+        //start_ultralight=(Button)findViewById(R.id.button_ultralight);
+        start_scan = (Button)findViewById(R.id.button_ScanAndUpload);
+        start_scan2 = (Button)findViewById(R.id.button_scan2);
+        start_scan3 = (Button)findViewById(R.id.button_scan3);
+        //start_mifare.setOnClickListener(this);
+        //start_15693.setOnClickListener(this);
+        //start_2ndGID.setOnClickListener(this);
+        //start_ultralight.setOnClickListener(this);
         start_scan.setOnClickListener(this);
+        start_scan2.setOnClickListener(this);
+        start_scan3.setOnClickListener(this);
     }
 
 	@Override
@@ -66,6 +72,16 @@ public class RC663_RFIDActivity extends Activity implements OnClickListener {
 		else if(arg0 == start_scan) {
 			Intent i = new Intent();
 			i.setClass(this, ScanAndUpload.class);
+			startActivity(i);
+			finish();
+		} else if (arg0 == start_scan2) {
+			Intent i = new Intent();
+			i.setClass(this, Scan2.class);
+			startActivity(i);
+			finish();
+		} else if (arg0 == start_scan3) {
+			Intent i = new Intent();
+			i.setClass(this, Scan3.class);
 			startActivity(i);
 			finish();
 		}

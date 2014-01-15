@@ -46,7 +46,7 @@ import org.json.*;
 
 import android.os.AsyncTask;
 
-public class ScanAndUpload extends Activity implements OnClickListener {
+public class Scan2 extends Activity implements OnClickListener {
     /** Called when the activity is first created. */
 	
 	private static final String TAG = "rc663_15693_java";
@@ -57,6 +57,7 @@ public class ScanAndUpload extends Activity implements OnClickListener {
 	private Button submit;
 	private TextView main_info;
 	private TextView card_info;
+	private TextView textView1;
 	private EditText block_nr;
 	private CheckBox lock_block;
 	private CheckBox lock_afi;
@@ -64,6 +65,7 @@ public class ScanAndUpload extends Activity implements OnClickListener {
 	private DeviceControl power;
 	private Spinner spinner2;
 	private ListView listView;
+	private EditText editText1;
 	
 	private int block_max = 0;
 	private int block_size = 0;
@@ -72,7 +74,7 @@ public class ScanAndUpload extends Activity implements OnClickListener {
 	private ArrayAdapter adapter;
 	// private String[] myStringArray = {"gen1", "gen2"};
 	private List<String> items = new ArrayList<String>();
-	private IOCallback optionFetch, submitController = null;
+	private IOCallback fetchController = null, submitController = null;
 	private HashMap<String, String> wasteOptionsMap = new HashMap<String, String>();
 	private HashMap<String, String> wasteItemTypeMap = new HashMap<String, String>();
 	private HashMap<String, String> wasteItemSNMap = new HashMap<String, String>();
@@ -81,7 +83,7 @@ public class ScanAndUpload extends Activity implements OnClickListener {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.scanandupload);
+        setContentView(R.layout.scan2);
         
         TelephonyManager telephonyManager = (TelephonyManager)getSystemService(Context.TELEPHONY_SERVICE);
         this.imei = telephonyManager.getDeviceId();
@@ -94,10 +96,12 @@ public class ScanAndUpload extends Activity implements OnClickListener {
         get_info.setOnClickListener(this);
         get_info.setEnabled(true);
         
-        submit = (Button)findViewById(R.id.button_15693_upload);
-        submit.setOnClickListener(this);
-        submit.setEnabled(true);
+        //submit = (Button)findViewById(R.id.button_15693_upload);
+        //submit.setOnClickListener(this);
+        //submit.setEnabled(true);
         
+        //textView1 = (TextView)findViewById(R.id.textView1);
+        //editText1 = (EditText)findViewById(R.id.editText1);
         main_info = (TextView)findViewById(R.id.textView_15693_info);
         main_info.setMovementMethod(ScrollingMovementMethod.getInstance());
         card_info = (TextView)findViewById(R.id.textView_15693_cardinfo);
@@ -109,21 +113,6 @@ public class ScanAndUpload extends Activity implements OnClickListener {
         //lock_dsfid = (CheckBox)findViewById(R.id.checkBox_15693_lockdsfid);
         
         //items.add(new String("aloha_1"));
-        adapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, items);
-        listView = (ListView) findViewById(R.id.listView1);
-        listView.setLongClickable(true);
-        listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
-
-            public boolean onItemLongClick(AdapterView<?> arg0, View arg1,
-                    int pos, long id) {
-                // TODO Auto-generated method stub
-
-                handleItemModification(listView.getItemAtPosition(pos).toString());
-
-                return true;
-            }
-        }); 
-        listView.setAdapter(adapter);
         
         power = new DeviceControl();
         if(power.DeviceOpen(PW_DEV) < 0)
@@ -158,18 +147,8 @@ public class ScanAndUpload extends Activity implements OnClickListener {
         Log.d(TAG, "init ok");
         get_info.setEnabled(true);
         
-        spinner2 = (Spinner) findViewById(R.id.spinner2);
-        //this.addItemsOnSpinner2();
-        optionFetch = new OptionsCallbackController(this);
         
     }
-    
-    public void addItemsOnSpinner2(List<String> list) {
-    	ArrayAdapter<String> dataAdapter = new ArrayAdapter<String>(this,
-    		android.R.layout.simple_spinner_item, list);
-    	dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-    	spinner2.setAdapter(dataAdapter);
-      }
     
     @Override
     public void onDestroy()
@@ -179,52 +158,6 @@ public class ScanAndUpload extends Activity implements OnClickListener {
     	power.PowerOffDevice();
     	power.DeviceClose();
     	super.onDestroy();
-    }
-
-    public void handleItemModification(final String itemName)
-    {
-    	DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
-    	    @Override
-    	    public void onClick(DialogInterface dialog, int which) {
-    	        switch (which){
-    	        case DialogInterface.BUTTON_POSITIVE:
-    	            //Yes button clicked
-    	        	debugMessage("YES=" + itemName);
-    	        	deleteItemFromListWithName(itemName);
-    	            break;
-
-    	        case DialogInterface.BUTTON_NEGATIVE:
-    	            //No button clicked
-    	        	debugMessage("No");
-    	            break;
-    	        }
-    	    }
-    	};
-
-    	AlertDialog.Builder builder = new AlertDialog.Builder(this);
-    	builder.setMessage("是否删除「" + itemName + "」").setPositiveButton("是", dialogClickListener)
-    	    .setNegativeButton("否", dialogClickListener).show();
-    }
-    
-    public void addNewItemToList(String sn)
-    {
-    	String selectItem = (String)spinner2.getSelectedItem();
-    	String selectId = wasteOptionsMap.get(selectItem);
-    	String key = new String(spinner2.getSelectedItem() + "&" + sn);
-    	items.add(key);
-    	wasteItemTypeMap.put(key, selectId);
-    	wasteItemSNMap.put(key, sn);
-    	
-		adapter.notifyDataSetChanged();
-    }
-    
-    public void deleteItemFromListWithName(String itemName)
-    {
-    	items.remove(itemName);
-    	wasteItemTypeMap.remove(itemName);
-    	wasteItemSNMap.remove(itemName);
-    	
-		adapter.notifyDataSetChanged();
     }
     
     public void debugMessage(String msg)
@@ -239,76 +172,46 @@ public class ScanAndUpload extends Activity implements OnClickListener {
     	}
     }
     
-    public class OptionsCallbackController implements IOCallback {
-    	ScanAndUpload activity;
-    	List<String> list = new ArrayList<String>();
-    	public OptionsCallbackController(ScanAndUpload activity) {
+    public class FetchItemCallbackController implements IOCallback {
+    	Scan2 activity;
+    	String sn;
+    	ProgressDialog progDialog;
+    	List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>();
+    	public FetchItemCallbackController(Scan2 activity, String sn) {
+    		this.sn = sn;
     		this.activity = activity;
-    		new LongRunningGetIO("http://stacky.takau.net/android/getItemOptions.php?imei=" + activity.imei, null, this).execute();
+    		NameValuePair postContent = new BasicNameValuePair("sn", sn);
+    		nameValuePairs.add(postContent);
+    		new LongRunningGetIO("http://stacky.takau.net/android/fetchItem.php?imei=" + activity.imei, nameValuePairs, this).execute();
+    		
+    		progDialog = ProgressDialog.show(activity, "正在获取信息",
+    	            "请稍候...", true);
     	}
     	
-    	private void parseJSON(String value) throws JSONException
+    	public void parseJSON(String value) throws JSONException
     	{
     		JSONObject jObject = new JSONObject(value);
-    		JSONArray jArray = jObject.getJSONArray("wasteOptions");
-    		for (int i=0; i < jArray.length(); i++)
-    		{
-    		    try {
-    		        JSONObject oneObject = jArray.getJSONObject(i);
-    		        // Pulling items from the array
-    		        String optionName = oneObject.getString("name");
-    		        String optionId = oneObject.getString("id");
-    		        activity.wasteOptionsMap.put(optionName, optionId);
-    		        list.add(optionName);
-    		    } catch (JSONException e) {
-    		        // Oops
-    		    }
-    		}
+    		activity.popupEditText(sn, jObject.getString("num"));
     	}
     	
-    	public void httpRequestDidFinish(int success, String value) {
-    		if(success == 0) {
-    			AlertDialog.Builder builder = new AlertDialog.Builder(activity);
-		        builder.setTitle("不能连接到服务器")
-		        .setMessage("获取废弃物列表错误")
-		        .setCancelable(false)
-		        .setNegativeButton("确定",new DialogInterface.OnClickListener() {
-		            public void onClick(DialogInterface dialog, int id) {
-		                dialog.cancel();
-		            }
-		        });
-		        AlertDialog alert = builder.create();
-		        alert.show();
-		        return;
-    		}
-    		activity.debugMessage(value);
+    	public void httpRequestDidFinish(int success, String value)
+    	{
     		try {
-				this.parseJSON(value);
-				activity.addItemsOnSpinner2(list);
-				
+				parseJSON(value);
 			} catch (JSONException e) {
-				AlertDialog.Builder builder = new AlertDialog.Builder(activity);
-		        builder.setTitle("服务器返回错误")
-		        .setMessage("获取废弃物列表错误")
-		        .setCancelable(false)
-		        .setNegativeButton("确定",new DialogInterface.OnClickListener() {
-		            public void onClick(DialogInterface dialog, int id) {
-		                dialog.cancel();
-		            }
-		        });
-		        AlertDialog alert = builder.create();
-		        alert.show();
+				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-    		
+    		progDialog.dismiss();
+    		activity.fetchController = null;
     	}
     }
     
     public class SubmitCallbackController implements IOCallback {
-    	ScanAndUpload activity;
+    	Scan2 activity;
     	ProgressDialog progDialog;
     	List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>();
-    	public SubmitCallbackController(ScanAndUpload activity, JSONObject postJson) {
+    	public SubmitCallbackController(Scan2 activity, JSONObject postJson) {
     		this.activity = activity;
     		NameValuePair postContent = new BasicNameValuePair("items", postJson.toString());
     		nameValuePairs.add(postContent);
@@ -355,6 +258,34 @@ public class ScanAndUpload extends Activity implements OnClickListener {
 	        
 	        activity.submitController = null;
     	}
+    }
+    
+    public void popupEditText(String sn, String value)
+    {
+    	AlertDialog.Builder alert = new AlertDialog.Builder(this);
+
+    	alert.setTitle("修改重量");
+    	alert.setMessage("RFID: " + sn);
+
+    	// Set an EditText view to get user input 
+    	final EditText input = new EditText(this);
+    	input.setText(value);
+    	alert.setView(input);
+
+    	alert.setPositiveButton("确定", new DialogInterface.OnClickListener() {
+    	public void onClick(DialogInterface dialog, int whichButton) {
+
+    	  // Do something with value!
+    	  }
+    	});
+
+    	alert.setNegativeButton("取消", new DialogInterface.OnClickListener() {
+    	  public void onClick(DialogInterface dialog, int whichButton) {
+    	    // Canceled.
+    	  }
+    	});
+
+    	alert.show();
     }
     
 	@Override
@@ -406,7 +337,11 @@ public class ScanAndUpload extends Activity implements OnClickListener {
 				sn = sn + String.format("%02X", uid[i]);
 			}
 			//new LongRunningGetIO(sn + "-" + this.imei, new NullCallback()).execute();
-			this.addNewItemToList(sn);
+			//this.addNewItemToList(sn);
+			
+			if(fetchController == null)
+				fetchController = new FetchItemCallbackController(this, sn);
+			
 		
 			byte[] cinfo = dev.ReadCardInfo();
 			if(cinfo == null)
@@ -423,24 +358,6 @@ public class ScanAndUpload extends Activity implements OnClickListener {
 			
 			block_max = cinfo[Iso15693_native.ISO15693_INFO_AT_BLOCK_NR];
 			block_size = cinfo[Iso15693_native.ISO15693_INFO_AT_BLOCK_SIZE];
-		} else if(arg0 == submit) {
-			JSONObject myjson = new JSONObject();
-			Iterator it = wasteItemTypeMap.entrySet().iterator();
-		    while (it.hasNext()) {
-		        Map.Entry pairs = (Map.Entry)it.next();
-		        //System.out.println(pairs.getKey() + " = " + pairs.getValue());
-		        try {
-					myjson.put(wasteItemSNMap.get(pairs.getKey()), pairs.getValue());
-				} catch (JSONException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-		        items.remove(pairs.getKey());
-		        wasteItemSNMap.remove(pairs.getKey());
-		        it.remove(); // avoids a ConcurrentModificationException
-		    }
-		    if(submitController == null) submitController = new SubmitCallbackController(this, myjson);
-		    adapter.notifyDataSetChanged();
 		}
 	}
     

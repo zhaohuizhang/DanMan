@@ -35,6 +35,12 @@
         <activity
             android:name="com.geomobile.rc663.ScanAndUpload">
         </activity> 
+        <activity
+            android:name="com.geomobile.rc663.Scan2">
+        </activity> 
+        <activity
+            android:name="com.geomobile.rc663.Scan3">
+        </activity> 
             
     </application>
 

@@ -12,32 +12,21 @@
         android:textAppearance="?android:attr/textAppearanceLarge" />
 
     <Button
-        android:id="@+id/button_mifare"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/btn_in_14443a" />
-
-    <Button
-        android:id="@+id/button_15693"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/btn_in_15693" />
-
-    <Button
-        android:id="@+id/button_2ndGID"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/btn_in_2ndGID" />
-    <Button
-        android:id="@+id/button_ultralight"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/btn_in_ultralight" />
-
-    <Button
         android:id="@+id/button_ScanAndUpload"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/btn_in_scan" />
+
+    <Button
+        android:id="@+id/button_scan2"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Scan 2" />
+
+    <Button
+        android:id="@+id/button_scan3"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Scan 3" />
 
 </LinearLayout>
