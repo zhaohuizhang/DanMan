@@ -17,6 +17,7 @@ public class RC663_RFIDActivity extends Activity implements OnClickListener {
 	private Button start_scan;
 	private Button start_scan2;
 	private Button start_scan3;
+	private Button start_scan4;
 	
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -30,6 +31,8 @@ public class RC663_RFIDActivity extends Activity implements OnClickListener {
         start_scan = (Button)findViewById(R.id.button_ScanAndUpload);
         start_scan2 = (Button)findViewById(R.id.button_scan2);
         start_scan3 = (Button)findViewById(R.id.button_scan3);
+        start_scan4 = (Button)findViewById(R.id.button_scan4);
+        
         //start_mifare.setOnClickListener(this);
         //start_15693.setOnClickListener(this);
         //start_2ndGID.setOnClickListener(this);
@@ -37,6 +40,7 @@ public class RC663_RFIDActivity extends Activity implements OnClickListener {
         start_scan.setOnClickListener(this);
         start_scan2.setOnClickListener(this);
         start_scan3.setOnClickListener(this);
+        start_scan4.setOnClickListener(this);
     }
 
 	@Override
@@ -82,6 +86,11 @@ public class RC663_RFIDActivity extends Activity implements OnClickListener {
 		} else if (arg0 == start_scan3) {
 			Intent i = new Intent();
 			i.setClass(this, Scan3.class);
+			startActivity(i);
+			finish();
+		} else if (arg0 == start_scan4) {
+			Intent i = new Intent();
+			i.setClass(this, Scan4.class);
 			startActivity(i);
 			finish();
 		}

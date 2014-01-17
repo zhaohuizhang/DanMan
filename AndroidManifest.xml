@@ -40,7 +40,10 @@
         </activity> 
         <activity
             android:name="com.geomobile.rc663.Scan3">
-        </activity> 
+        </activity>
+        <activity
+            android:name="com.geomobile.rc663.Scan4">
+        </activity>  
             
     </application>
 

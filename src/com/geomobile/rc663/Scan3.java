@@ -64,6 +64,8 @@ public class Scan3 extends Activity implements OnClickListener {
 	private DeviceControl power;
 	private Spinner spinner2;
 	private ListView listView;
+	public String myTitle = "出库扫描";
+	public String myURL = "http://202.120.58.114/api/wasteOut.php";
 	
 	private int block_max = 0;
 	private int block_size = 0;
@@ -81,7 +83,7 @@ public class Scan3 extends Activity implements OnClickListener {
         
         TelephonyManager telephonyManager = (TelephonyManager)getSystemService(Context.TELEPHONY_SERVICE);
         this.imei = telephonyManager.getDeviceId();
-        ((TextView)findViewById(R.id.textView_addNew)).setText("出库扫描");
+        ((TextView)findViewById(R.id.textView_addNew)).setText(myTitle);
         
         //start_demo = (Button)findViewById(R.id.button_15693_demo);
         //start_demo.setOnClickListener(this);
@@ -226,9 +228,9 @@ public class Scan3 extends Activity implements OnClickListener {
     	List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>();
     	public SubmitCallbackController(Scan3 activity, JSONObject postJson) {
     		this.activity = activity;
-    		NameValuePair postContent = new BasicNameValuePair("items", postJson.toString());
+    		NameValuePair postContent = new BasicNameValuePair("txt_json", postJson.toString());
     		nameValuePairs.add(postContent);
-    		new LongRunningGetIO("http://stacky.takau.net/android/exportItems.php?imei=" + activity.imei, nameValuePairs, this).execute();
+    		new LongRunningGetIO(activity.myURL, nameValuePairs, this).execute();
     		
     		progDialog = ProgressDialog.show(activity, "正在上传",
     	            "请稍候...", true);
@@ -344,12 +346,21 @@ public class Scan3 extends Activity implements OnClickListener {
 			Iterator it = items.iterator();
 		    while (it.hasNext()) {
 		        String thissn = (String)it.next();
-		        myjson.put(thissn);
+		        JSONObject newObj = new JSONObject();
+		        try {
+					newObj.put("rfid", thissn);
+				} catch (JSONException e) {
+					// TODO Auto-generated catch block
+					Log.d(TAG, "parse error");
+					e.printStackTrace();
+				}
+		        myjson.put(newObj);
 		        it.remove(); // avoids a ConcurrentModificationException
 		    }
 		    JSONObject myupload = new JSONObject();
 		    try {
-				myupload.put("items", myjson);
+				myupload.put("rfidlist", myjson);
+				myupload.put("imei", this.imei);
 			} catch (JSONException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();

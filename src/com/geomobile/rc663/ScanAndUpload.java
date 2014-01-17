@@ -231,6 +231,20 @@ public class ScanAndUpload extends Activity implements OnClickListener {
     {
     	TextView main_info = (TextView)findViewById(R.id.textView_15693_info);
 		main_info.setText(msg);
+		
+		/*
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Debug msg")
+        .setMessage(msg)
+        .setCancelable(false)
+        .setNegativeButton("确定",new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int id) {
+                dialog.cancel();
+            }
+        });
+        AlertDialog alert = builder.create();
+        alert.show();
+        */
     }
     
     public class NullCallback implements IOCallback {
@@ -244,7 +258,7 @@ public class ScanAndUpload extends Activity implements OnClickListener {
     	List<String> list = new ArrayList<String>();
     	public OptionsCallbackController(ScanAndUpload activity) {
     		this.activity = activity;
-    		new LongRunningGetIO("http://stacky.takau.net/android/getItemOptions.php?imei=" + activity.imei, null, this).execute();
+    		new LongRunningGetIO("http://202.120.58.114/api/getWasteName.php?imei=" + activity.imei, null, this).execute();
     	}
     	
     	private void parseJSON(String value) throws JSONException
@@ -308,11 +322,20 @@ public class ScanAndUpload extends Activity implements OnClickListener {
     	ScanAndUpload activity;
     	ProgressDialog progDialog;
     	List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>();
-    	public SubmitCallbackController(ScanAndUpload activity, JSONObject postJson) {
+    	public SubmitCallbackController(ScanAndUpload activity, JSONArray postJson) {
     		this.activity = activity;
-    		NameValuePair postContent = new BasicNameValuePair("items", postJson.toString());
+    		JSONObject newPostJson = new JSONObject();
+    		try {
+				newPostJson.put("imei", activity.imei);
+				newPostJson.put("wasteBindList", postJson);
+			} catch (JSONException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+    		NameValuePair postContent = new BasicNameValuePair("txt_json", newPostJson.toString());
+    		Log.d(TAG, newPostJson.toString());
     		nameValuePairs.add(postContent);
-    		new LongRunningGetIO("http://stacky.takau.net/android/postNewItems.php?imei=" + activity.imei, nameValuePairs, this).execute();
+    		new LongRunningGetIO("http://202.120.58.114/api/bindRfid.php", nameValuePairs, this).execute();
     		
     		progDialog = ProgressDialog.show(activity, "正在上传",
     	            "请稍候...", true);
@@ -424,13 +447,19 @@ public class ScanAndUpload extends Activity implements OnClickListener {
 			block_max = cinfo[Iso15693_native.ISO15693_INFO_AT_BLOCK_NR];
 			block_size = cinfo[Iso15693_native.ISO15693_INFO_AT_BLOCK_SIZE];
 		} else if(arg0 == submit) {
-			JSONObject myjson = new JSONObject();
+			JSONArray myjson = new JSONArray();
 			Iterator it = wasteItemTypeMap.entrySet().iterator();
 		    while (it.hasNext()) {
 		        Map.Entry pairs = (Map.Entry)it.next();
 		        //System.out.println(pairs.getKey() + " = " + pairs.getValue());
 		        try {
-					myjson.put(wasteItemSNMap.get(pairs.getKey()), pairs.getValue());
+					// myjson.put(wasteItemSNMap.get(pairs.getKey()), pairs.getValue());
+		        	JSONObject myobj = new JSONObject();
+		        	myobj.put("rfid", wasteItemSNMap.get(pairs.getKey()));
+		        	myobj.put("wasteid", pairs.getValue());
+		        	myobj.put("addway", "0");
+		        	myjson.put(myobj);
+		        	
 				} catch (JSONException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();

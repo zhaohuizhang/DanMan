@@ -180,9 +180,9 @@ public class Scan2 extends Activity implements OnClickListener {
     	public FetchItemCallbackController(Scan2 activity, String sn) {
     		this.sn = sn;
     		this.activity = activity;
-    		NameValuePair postContent = new BasicNameValuePair("sn", sn);
-    		nameValuePairs.add(postContent);
-    		new LongRunningGetIO("http://stacky.takau.net/android/fetchItem.php?imei=" + activity.imei, nameValuePairs, this).execute();
+    		//NameValuePair postContent = new BasicNameValuePair("sn", sn);
+    		//nameValuePairs.add(postContent);
+    		new LongRunningGetIO("http://202.120.58.114/api/getRfidWasteName.php?imei=" + activity.imei + "&rfid=" + sn, nameValuePairs, this).execute();
     		
     		progDialog = ProgressDialog.show(activity, "正在获取信息",
     	            "请稍候...", true);
@@ -191,11 +191,12 @@ public class Scan2 extends Activity implements OnClickListener {
     	public void parseJSON(String value) throws JSONException
     	{
     		JSONObject jObject = new JSONObject(value);
-    		activity.popupEditText(sn, jObject.getString("num"));
+    		activity.popupEditText(sn, "原先数值: " + jObject.getString("total"), jObject);
     	}
     	
     	public void httpRequestDidFinish(int success, String value)
     	{
+    		Log.d(TAG, value);
     		try {
 				parseJSON(value);
 			} catch (JSONException e) {
@@ -213,9 +214,9 @@ public class Scan2 extends Activity implements OnClickListener {
     	List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>();
     	public SubmitCallbackController(Scan2 activity, JSONObject postJson) {
     		this.activity = activity;
-    		NameValuePair postContent = new BasicNameValuePair("items", postJson.toString());
+    		NameValuePair postContent = new BasicNameValuePair("txt_json", postJson.toString());
     		nameValuePairs.add(postContent);
-    		new LongRunningGetIO("http://stacky.takau.net/android/postNewItems.php?imei=" + activity.imei, nameValuePairs, this).execute();
+    		new LongRunningGetIO("http://202.120.58.114/api/addWaste.php", nameValuePairs, this).execute();
     		
     		progDialog = ProgressDialog.show(activity, "正在上传",
     	            "请稍候...", true);
@@ -260,22 +261,40 @@ public class Scan2 extends Activity implements OnClickListener {
     	}
     }
     
-    public void popupEditText(String sn, String value)
+    public void popupEditText(final String sn, String value, final JSONObject original)
     {
     	AlertDialog.Builder alert = new AlertDialog.Builder(this);
 
-    	alert.setTitle("修改重量");
-    	alert.setMessage("RFID: " + sn);
+    	alert.setTitle("新增重量");
+    	alert.setMessage("RFID: " + sn + "\n" + value);
 
     	// Set an EditText view to get user input 
     	final EditText input = new EditText(this);
-    	input.setText(value);
+    	input.setText("0");
     	alert.setView(input);
+    	
+    	final Scan2 myself = this;
 
     	alert.setPositiveButton("确定", new DialogInterface.OnClickListener() {
     	public void onClick(DialogInterface dialog, int whichButton) {
 
     	  // Do something with value!
+    		JSONObject toUpload = new JSONObject();
+    		
+    		try {
+    			toUpload.put("rfid", sn);
+				toUpload.put("wasteid", original.getString("id"));
+				toUpload.put("imei", myself.imei);
+				toUpload.put("addway", "0");
+				toUpload.put("addnum", input.getText());
+				
+				myself.readyToSubmit(toUpload);
+			} catch (JSONException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+    		
+    		
     	  }
     	});
 
@@ -286,6 +305,11 @@ public class Scan2 extends Activity implements OnClickListener {
     	});
 
     	alert.show();
+    }
+    
+    public void readyToSubmit(JSONObject content)
+    {
+    	this.submitController = new SubmitCallbackController(this, content);
     }
     
 	@Override
