@@ -7,6 +7,9 @@ import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.media.Ringtone;
+import android.media.RingtoneManager;
+import android.net.Uri;
 import android.os.Bundle;
 import android.telephony.TelephonyManager;
 import android.text.method.ScrollingMovementMethod;
@@ -46,7 +49,7 @@ import org.json.*;
 
 import android.os.AsyncTask;
 
-public class ScanAndUpload extends Activity implements OnClickListener {
+public class ScanAndUpload extends ScanActivity implements OnClickListener {
     /** Called when the activity is first created. */
 	
 	private static final String TAG = "rc663_15693_java";
@@ -76,6 +79,8 @@ public class ScanAndUpload extends Activity implements OnClickListener {
 	private HashMap<String, String> wasteOptionsMap = new HashMap<String, String>();
 	private HashMap<String, String> wasteItemTypeMap = new HashMap<String, String>();
 	private HashMap<String, String> wasteItemSNMap = new HashMap<String, String>();
+	private HashMap<String, String> wasteItemWayMap = new HashMap<String, String>();
+	
 	
 	
     @Override
@@ -206,14 +211,18 @@ public class ScanAndUpload extends Activity implements OnClickListener {
     	    .setNegativeButton("否", dialogClickListener).show();
     }
     
-    public void addNewItemToList(String sn)
+    public void addNewItemToList(String sn, Integer way)
     {
     	String selectItem = (String)spinner2.getSelectedItem();
     	String selectId = wasteOptionsMap.get(selectItem);
-    	String key = new String(spinner2.getSelectedItem() + "&" + sn);
+    	String key = new String(/*(wasteItemTypeMap.size() + 1) + ". " + */sn);
     	items.add(key);
     	wasteItemTypeMap.put(key, selectId);
     	wasteItemSNMap.put(key, sn);
+    	wasteItemWayMap.put(key, way.toString());
+    	Uri notification = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+    	Ringtone r = RingtoneManager.getRingtone(getApplicationContext(), notification);
+    	r.play();
     	
 		adapter.notifyDataSetChanged();
     }
@@ -225,6 +234,34 @@ public class ScanAndUpload extends Activity implements OnClickListener {
     	wasteItemSNMap.remove(itemName);
     	
 		adapter.notifyDataSetChanged();
+    }
+    
+    
+    public void popupSelect(final String sn)
+    {
+    	AlertDialog levelDialog;
+    	final ScanAndUpload myself = this;
+
+    	// Strings to Show In Dialog with Radio Buttons
+    	final CharSequence[] items = {"桶装","袋装"};
+    	            
+    	                // Creating and Building the Dialog 
+    	                AlertDialog.Builder builder = new AlertDialog.Builder(this);
+    	                builder.setTitle("请选择装包方式");
+    	                builder.setSingleChoiceItems(items, -1, new DialogInterface.OnClickListener() {
+    	                public void onClick(DialogInterface dialog, int item) {
+    	                   
+    	                	dialog.dismiss();
+    	                    if(myself.wasteItemSNMap.containsValue(sn)) {
+    	                    	myself.alertMessage("已经添加过该废弃物");
+    	                    } else {
+    	                    	myself.addNewItemToList(sn, item);
+    	                    }
+    	                        
+    	                    }
+    	                });
+    	                levelDialog = builder.create();
+    	                levelDialog.show();
     }
     
     public void debugMessage(String msg)
@@ -276,6 +313,7 @@ public class ScanAndUpload extends Activity implements OnClickListener {
     		        list.add(optionName);
     		    } catch (JSONException e) {
     		        // Oops
+    		    	activity.alertMessage("返回列表解析错误");
     		    }
     		}
     	}
@@ -340,41 +378,16 @@ public class ScanAndUpload extends Activity implements OnClickListener {
     		progDialog = ProgressDialog.show(activity, "正在上传",
     	            "请稍候...", true);
     	}
-    	private void parseJSON(String value) throws JSONException
+    	private void parseJSON(String value)
     	{
-    		/*
-    		JSONObject jObject = new JSONObject(value);
-    		JSONArray jArray = jObject.getJSONArray("wasteOptions");
-    		for (int i=0; i < jArray.length(); i++)
-    		{
-    		    try {
-    		        JSONObject oneObject = jArray.getJSONObject(i);
-    		        // Pulling items from the array
-    		        String optionName = oneObject.getString("name");
-    		        String optionId = oneObject.getString("id");
-    		        activity.wasteOptionsMap.put(optionName, optionId);
-    		        list.add(optionName);
-    		    } catch (JSONException e) {
-    		        // Oops
-    		    }
-    		}*/
+    		ErrorParser.parse(activity, value);
     	}
     	
     	public void httpRequestDidFinish(int success, String value) {
     		progDialog.dismiss();
     		
     		// nameValuePairs.add(new BasicNameValuePair("id", "12345"));
-    		AlertDialog.Builder builder = new AlertDialog.Builder(activity);
-	        builder.setTitle("NVPUpload")
-	        .setMessage(value)
-	        .setCancelable(false)
-	        .setNegativeButton("确定",new DialogInterface.OnClickListener() {
-	            public void onClick(DialogInterface dialog, int id) {
-	                dialog.cancel();
-	            }
-	        });
-	        AlertDialog alert = builder.create();
-	        alert.show();
+    		this.parseJSON(value);
 	        
 	        activity.submitController = null;
     	}
@@ -429,7 +442,7 @@ public class ScanAndUpload extends Activity implements OnClickListener {
 				sn = sn + String.format("%02X", uid[i]);
 			}
 			//new LongRunningGetIO(sn + "-" + this.imei, new NullCallback()).execute();
-			this.addNewItemToList(sn);
+			this.popupSelect(sn);
 		
 			byte[] cinfo = dev.ReadCardInfo();
 			if(cinfo == null)
@@ -457,7 +470,7 @@ public class ScanAndUpload extends Activity implements OnClickListener {
 		        	JSONObject myobj = new JSONObject();
 		        	myobj.put("rfid", wasteItemSNMap.get(pairs.getKey()));
 		        	myobj.put("wasteid", pairs.getValue());
-		        	myobj.put("addway", "0");
+		        	myobj.put("addway", wasteItemWayMap.get(pairs.getKey()));
 		        	myjson.put(myobj);
 		        	
 				} catch (JSONException e) {

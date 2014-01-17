@@ -46,7 +46,7 @@ import org.json.*;
 
 import android.os.AsyncTask;
 
-public class Scan3 extends Activity implements OnClickListener {
+public class Scan3 extends ScanActivity implements OnClickListener {
     /** Called when the activity is first created. */
 	
 	private static final String TAG = "rc663_15693_java";
@@ -197,6 +197,10 @@ public class Scan3 extends Activity implements OnClickListener {
     
     public void addNewItemToList(String sn)
     {
+    	if(items.contains(sn)) {
+    		this.alertMessage("重复条目");
+    		return;
+    	}
     	String key = sn;
     	items.add(key);
     	
@@ -235,45 +239,22 @@ public class Scan3 extends Activity implements OnClickListener {
     		progDialog = ProgressDialog.show(activity, "正在上传",
     	            "请稍候...", true);
     	}
-    	private void parseJSON(String value) throws JSONException
+    	private void parseJSON(String value)
     	{
-    		/*
-    		JSONObject jObject = new JSONObject(value);
-    		JSONArray jArray = jObject.getJSONArray("wasteOptions");
-    		for (int i=0; i < jArray.length(); i++)
-    		{
-    		    try {
-    		        JSONObject oneObject = jArray.getJSONObject(i);
-    		        // Pulling items from the array
-    		        String optionName = oneObject.getString("name");
-    		        String optionId = oneObject.getString("id");
-    		        activity.wasteOptionsMap.put(optionName, optionId);
-    		        list.add(optionName);
-    		    } catch (JSONException e) {
-    		        // Oops
-    		    }
-    		}*/
+    		Log.d(TAG, value);
+    		ErrorParser.parse(activity, value);
+    		
     	}
     	
     	public void httpRequestDidFinish(int success, String value) {
     		progDialog.dismiss();
     		
-    		// nameValuePairs.add(new BasicNameValuePair("id", "12345"));
-    		AlertDialog.Builder builder = new AlertDialog.Builder(activity);
-	        builder.setTitle("NVPUpload")
-	        .setMessage(value)
-	        .setCancelable(false)
-	        .setNegativeButton("确定",new DialogInterface.OnClickListener() {
-	            public void onClick(DialogInterface dialog, int id) {
-	                dialog.cancel();
-	            }
-	        });
-	        AlertDialog alert = builder.create();
-	        alert.show();
+    		this.parseJSON(value);
 	        
 	        activity.submitController = null;
     	}
     }
+    
     
 	@Override
 	public void onClick(View arg0) {

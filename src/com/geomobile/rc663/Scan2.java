@@ -46,7 +46,7 @@ import org.json.*;
 
 import android.os.AsyncTask;
 
-public class Scan2 extends Activity implements OnClickListener {
+public class Scan2 extends ScanActivity implements OnClickListener {
     /** Called when the activity is first created. */
 	
 	private static final String TAG = "rc663_15693_java";
@@ -172,6 +172,7 @@ public class Scan2 extends Activity implements OnClickListener {
     	}
     }
     
+    
     public class FetchItemCallbackController implements IOCallback {
     	Scan2 activity;
     	String sn;
@@ -202,6 +203,28 @@ public class Scan2 extends Activity implements OnClickListener {
 			} catch (JSONException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
+				try {
+					JSONObject jObject = new JSONObject(value);
+					String errmsg = "出现错误\n";
+					if(jObject.get("error") instanceof JSONArray) {
+						JSONArray jArr = (JSONArray)jObject.get("error");
+						for(int i = 0; i < jArr.length(); i++) {
+							JSONObject jj = jArr.getJSONObject(i);
+							errmsg += jj.getString("rfid") + ": " + jj.getString("des") + "\n";
+						}
+					} else {
+						errmsg += ((JSONObject)(jObject.get("error"))).getString("rfid") + ": " + ((JSONObject)(jObject.get("error"))).getString("des") + "\n";
+					}
+					activity.alertMessage(errmsg);
+				} catch (JSONException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+					if(value.contains("error")) {
+						activity.alertMessage("出现错误" + value);
+					} else {
+						activity.alertMessage("未知错误" + value);
+					}
+				}
 			}
     		progDialog.dismiss();
     		activity.fetchController = null;
@@ -221,31 +244,17 @@ public class Scan2 extends Activity implements OnClickListener {
     		progDialog = ProgressDialog.show(activity, "正在上传",
     	            "请稍候...", true);
     	}
-    	private void parseJSON(String value) throws JSONException
+    	private void parseJSON(String value)
     	{
-    		/*
-    		JSONObject jObject = new JSONObject(value);
-    		JSONArray jArray = jObject.getJSONArray("wasteOptions");
-    		for (int i=0; i < jArray.length(); i++)
-    		{
-    		    try {
-    		        JSONObject oneObject = jArray.getJSONObject(i);
-    		        // Pulling items from the array
-    		        String optionName = oneObject.getString("name");
-    		        String optionId = oneObject.getString("id");
-    		        activity.wasteOptionsMap.put(optionName, optionId);
-    		        list.add(optionName);
-    		    } catch (JSONException e) {
-    		        // Oops
-    		    }
-    		}*/
+    		ErrorParser.parse(activity, value);
+    		
     	}
     	
     	public void httpRequestDidFinish(int success, String value) {
     		progDialog.dismiss();
     		
     		// nameValuePairs.add(new BasicNameValuePair("id", "12345"));
-    		AlertDialog.Builder builder = new AlertDialog.Builder(activity);
+    		/*AlertDialog.Builder builder = new AlertDialog.Builder(activity);
 	        builder.setTitle("NVPUpload")
 	        .setMessage(value)
 	        .setCancelable(false)
@@ -255,7 +264,8 @@ public class Scan2 extends Activity implements OnClickListener {
 	            }
 	        });
 	        AlertDialog alert = builder.create();
-	        alert.show();
+	        alert.show();*/
+    		this.parseJSON(value);
 	        
 	        activity.submitController = null;
     	}
@@ -277,7 +287,28 @@ public class Scan2 extends Activity implements OnClickListener {
 
     	alert.setPositiveButton("确定", new DialogInterface.OnClickListener() {
     	public void onClick(DialogInterface dialog, int whichButton) {
-
+    	    try {
+    	    	Double.parseDouble(input.getText().toString());
+    	    } catch(NumberFormatException nfe) {
+    	    	myself.alertMessage("请输入数字");
+    	    	return;
+    	    }
+    	    try {
+    	    	Integer.parseInt(input.getText().toString());
+    	    } catch(NumberFormatException nfe) {
+    	    	try {
+					if(Integer.parseInt(original.getString("way")) == 1) {
+						myself.alertMessage("请输入整数");
+						return;
+					}
+				} catch (NumberFormatException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (JSONException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+    	    }
     	  // Do something with value!
     		JSONObject toUpload = new JSONObject();
     		
@@ -285,7 +316,7 @@ public class Scan2 extends Activity implements OnClickListener {
     			toUpload.put("rfid", sn);
 				toUpload.put("wasteid", original.getString("id"));
 				toUpload.put("imei", myself.imei);
-				toUpload.put("addway", "0");
+				toUpload.put("addway", original.getString("way"));
 				toUpload.put("addnum", input.getText());
 				
 				myself.readyToSubmit(toUpload);
