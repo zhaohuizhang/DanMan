@@ -12,37 +12,46 @@
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name" >
         <activity
-            android:name=".RC663_RFIDActivity"
+            android:name=".RC663_RFIDActivity"    
+			android:theme="@android:style/Theme.NoTitleBar.Fullscreen"
             android:label="@string/app_name" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
+            </intent-filter> 
         </activity>
         <activity 
-  			android:name="com.geomobile.rc663.Mifare">      
+  			android:name="com.geomobile.rc663.Mifare"
+  			android:theme="@android:style/Theme.NoTitleBar.Fullscreen">   
         </activity>
         <activity
-            android:name="com.geomobile.rc663.Iso15693">
+            android:name="com.geomobile.rc663.Iso15693"
+            android:theme="@android:style/Theme.NoTitleBar.Fullscreen">
         </activity>
         <activity
-            android:name="com.geomobile.rc663.SecondGID">
+            android:name="com.geomobile.rc663.SecondGID"
+            android:theme="@android:style/Theme.NoTitleBar.Fullscreen">
         </activity>
          <activity
-            android:name="com.geomobile.rc663.ultralight">
+            android:name="com.geomobile.rc663.ultralight"
+            android:theme="@android:style/Theme.NoTitleBar.Fullscreen">
         </activity> 
         <activity
-            android:name="com.geomobile.rc663.ScanAndUpload">
+            android:name="com.geomobile.rc663.ScanAndUpload"
+            android:theme="@android:style/Theme.NoTitleBar.Fullscreen">
         </activity> 
         <activity
-            android:name="com.geomobile.rc663.Scan2">
+            android:name="com.geomobile.rc663.Scan2"
+            android:theme="@android:style/Theme.NoTitleBar.Fullscreen">
         </activity> 
         <activity
-            android:name="com.geomobile.rc663.Scan3">
+            android:name="com.geomobile.rc663.Scan3"
+            android:theme="@android:style/Theme.NoTitleBar.Fullscreen">
         </activity>
         <activity
-            android:name="com.geomobile.rc663.Scan4">
+            android:name="com.geomobile.rc663.Scan4"
+            android:theme="@android:style/Theme.NoTitleBar.Fullscreen">
         </activity>  
             
     </application>

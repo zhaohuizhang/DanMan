@@ -295,7 +295,7 @@ public class ScanAndUpload extends ScanActivity implements OnClickListener {
     	List<String> list = new ArrayList<String>();
     	public OptionsCallbackController(ScanAndUpload activity) {
     		this.activity = activity;
-    		new LongRunningGetIO("http://202.120.58.114/api/getWasteName.php?imei=" + activity.imei, null, this).execute();
+    		new LongRunningGetIO(getString(R.string.url_prefix) + "getWasteName?imei=" + activity.imei, null, this).execute();
     	}
     	
     	private void parseJSON(String value) throws JSONException
@@ -339,17 +339,7 @@ public class ScanAndUpload extends ScanActivity implements OnClickListener {
 				activity.addItemsOnSpinner2(list);
 				
 			} catch (JSONException e) {
-				AlertDialog.Builder builder = new AlertDialog.Builder(activity);
-		        builder.setTitle("服务器返回错误")
-		        .setMessage("获取废弃物列表错误")
-		        .setCancelable(false)
-		        .setNegativeButton("确定",new DialogInterface.OnClickListener() {
-		            public void onClick(DialogInterface dialog, int id) {
-		                dialog.cancel();
-		            }
-		        });
-		        AlertDialog alert = builder.create();
-		        alert.show();
+				ErrorParser.parse(activity, value);
 				e.printStackTrace();
 			}
     		
@@ -373,7 +363,7 @@ public class ScanAndUpload extends ScanActivity implements OnClickListener {
     		NameValuePair postContent = new BasicNameValuePair("txt_json", newPostJson.toString());
     		Log.d(TAG, newPostJson.toString());
     		nameValuePairs.add(postContent);
-    		new LongRunningGetIO("http://202.120.58.114/api/bindRfid.php", nameValuePairs, this).execute();
+    		new LongRunningGetIO(getString(R.string.url_prefix) + "bindRfid", nameValuePairs, this).execute();
     		
     		progDialog = ProgressDialog.show(activity, "正在上传",
     	            "请稍候...", true);
@@ -416,50 +406,21 @@ public class ScanAndUpload extends ScanActivity implements OnClickListener {
 			};
 			newThread.start();
 			
-			byte[] uid = dev.SearchCard(Iso15693_native.ISO15693_ACTIVATE_ADDRESSED, Iso15693_native.ISO15693_FLAG_UPLINK_RATE_HIGH, Iso15693_native.ISO15693_FLAG_NO_USE_AFI, (byte)0, Iso15693_native.ISO15693_FLAG_ONE_SLOTS, null, 0);
-			if(uid == null)
-			{
-				card_info.setText("Error search card");
-				main_info.setText("");
-				AlertDialog.Builder builder = new AlertDialog.Builder(this);
-		        builder.setTitle("请将 RFID 标签置于识别区")
-		        .setMessage("未检测到任何 RFID 标签！")
-		        .setCancelable(false)
-		        .setNegativeButton("确定",new DialogInterface.OnClickListener() {
-		            public void onClick(DialogInterface dialog, int id) {
-		                dialog.cancel();
-		            }
-		        });
-		        AlertDialog alert = builder.create();
-		        alert.show();
+			String sn = Scanner.scan();
+			if(sn == null) {
+				this.alertMessage("未找到 RFID 设备");
 				return;
 			}
-			card_info.setText("SN: 0x");
-			String sn = "";
-			for(int i = Iso15693_native.ISO15693_UID_LENGTH - 1; i >= 0; i--)
-			{
-				card_info.append(String.format("%02X", uid[i]));
-				sn = sn + String.format("%02X", uid[i]);
-			}
-			//new LongRunningGetIO(sn + "-" + this.imei, new NullCallback()).execute();
+			
+			
 			this.popupSelect(sn);
 		
-			byte[] cinfo = dev.ReadCardInfo();
-			if(cinfo == null)
-			{
-				main_info.setText("Error get cardinfo, maybe card don't support");
+		} else if(arg0 == submit) {
+			if(wasteItemSNMap.size() == 0) {
+				this.alertMessage("列表为空");
 				return;
 			}
-			main_info.setText(String.format("AFI:					0x%x\n", cinfo[Iso15693_native.ISO15693_INFO_AT_AFI]));
-			main_info.append(String.format("DSFID:				0x%x\n", cinfo[Iso15693_native.ISO15693_INFO_AT_DSFID]));
-			main_info.append(String.format("BLOCK NUMBERS:	%d\n", cinfo[Iso15693_native.ISO15693_INFO_AT_BLOCK_NR]));
-			main_info.append(String.format("BLOCK SIZE:			%d\n", cinfo[Iso15693_native.ISO15693_INFO_AT_BLOCK_SIZE]));
-			main_info.append(String.format("IC :					0x%x\n\n", cinfo[Iso15693_native.ISO15693_INFO_AT_IC]));
-			//start_demo.setEnabled(true);
 			
-			block_max = cinfo[Iso15693_native.ISO15693_INFO_AT_BLOCK_NR];
-			block_size = cinfo[Iso15693_native.ISO15693_INFO_AT_BLOCK_SIZE];
-		} else if(arg0 == submit) {
 			JSONArray myjson = new JSONArray();
 			Iterator it = wasteItemTypeMap.entrySet().iterator();
 		    while (it.hasNext()) {

@@ -1,38 +1,49 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<AbsoluteLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
-    android:layout_height="fill_parent"
-    android:orientation="vertical" >
+    android:layout_height="fill_parent" >
 
     <TextView
         android:id="@+id/textView1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/text_main"
+        android:text="SJTU Omnilab\n废物管理系统"
         android:textAppearance="?android:attr/textAppearanceLarge" />
 
     <Button
         android:id="@+id/button_ScanAndUpload"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/btn_in_scan" />
-
-    <Button
-        android:id="@+id/button_scan2"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Scan 2" />
+        android:layout_width="95dp"
+        android:layout_height="64dp"
+        android:layout_x="14dp"
+        android:layout_y="92dp"
+        android:textSize="25dp"
+        android:text="绑定" />
 
     <Button
         android:id="@+id/button_scan3"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Scan 3" />
+        android:layout_width="95dp"
+        android:layout_height="64dp"
+        android:layout_x="16dp"
+        android:layout_y="190dp"
+        android:textSize="25dp"
+        android:text="出库" />
 
     <Button
         android:id="@+id/button_scan4"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Scan 4" />
+        android:layout_width="95dp"
+        android:layout_height="64dp"
+        android:layout_x="138dp"
+        android:layout_y="190dp"
+        android:textSize="25dp"
+        android:text="入库" />
 
-</LinearLayout>
+    <Button
+        android:id="@+id/button_scan2"
+        android:layout_width="95dp"
+        android:layout_height="64dp"
+        android:layout_x="136dp"
+        android:layout_y="92dp"
+        android:textSize="25dp"
+        android:text="新增" />
+
+</AbsoluteLayout>

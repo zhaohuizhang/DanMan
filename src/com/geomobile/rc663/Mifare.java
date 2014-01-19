@@ -88,6 +88,7 @@ public class Mifare extends Activity implements OnClickListener {
 		// TODO Auto-generated method stub
 		if(arg0 == start_demo)
 		{
+			/*
 			int block;
 			main_info.setText(R.string.msg_start);
 			try
@@ -108,7 +109,7 @@ public class Mifare extends Activity implements OnClickListener {
 			{
 				block = 63;
 				block_nr.setText(Integer.valueOf(block));
-			}
+			}*/
 			
 			//search a valid card
 			byte[] ID = dev.SearchCard();
@@ -117,15 +118,18 @@ public class Mifare extends Activity implements OnClickListener {
 				main_info.setText(R.string.msg_mifare_error_nocard);
 				return;
 			}
+			
 			String IDString = new String(" 0x");
 			for(byte a : ID)
 			{
 				IDString += String.format("%02X", a);
 			}
+			/*
 			main_info.setText(R.string.msg_mifare_ok_findcard);
 			main_info.append(IDString);
 			main_info.append("\n\n");
-			
+			*
+			/*
 			//auth the block to read/write
 			byte[] key = new byte[6];
 			for(int i = 0; i < 6; i++)
@@ -240,6 +244,7 @@ public class Mifare extends Activity implements OnClickListener {
 			main_info.append("\n\n");
 			
 			main_info.append(getString(R.string.msg_mifare_ok_allok));
+			*/
 		}
 	}
 }

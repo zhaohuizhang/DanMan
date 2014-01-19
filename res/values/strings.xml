@@ -55,4 +55,5 @@
     
     <string name="btn_2ndGID_info">Read China Second Generation ID card\'s UID</string>
     <string name="btn_in_scan">Scan 1</string>
+    <string name="url_prefix">http://stacky.takau.net/think/DWMS/www/index.php/Home/AndroidApi/</string>
 </resources>

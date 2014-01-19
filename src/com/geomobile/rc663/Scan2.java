@@ -183,7 +183,7 @@ public class Scan2 extends ScanActivity implements OnClickListener {
     		this.activity = activity;
     		//NameValuePair postContent = new BasicNameValuePair("sn", sn);
     		//nameValuePairs.add(postContent);
-    		new LongRunningGetIO("http://202.120.58.114/api/getRfidWasteName.php?imei=" + activity.imei + "&rfid=" + sn, nameValuePairs, this).execute();
+    		new LongRunningGetIO(getString(R.string.url_prefix) + "getRfidWasteName?imei=" + activity.imei + "&rfid=" + sn, nameValuePairs, this).execute();
     		
     		progDialog = ProgressDialog.show(activity, "正在获取信息",
     	            "请稍候...", true);
@@ -239,7 +239,7 @@ public class Scan2 extends ScanActivity implements OnClickListener {
     		this.activity = activity;
     		NameValuePair postContent = new BasicNameValuePair("txt_json", postJson.toString());
     		nameValuePairs.add(postContent);
-    		new LongRunningGetIO("http://202.120.58.114/api/addWaste.php", nameValuePairs, this).execute();
+    		new LongRunningGetIO(getString(R.string.url_prefix) + "addWaste", nameValuePairs, this).execute();
     		
     		progDialog = ProgressDialog.show(activity, "正在上传",
     	            "请稍候...", true);
@@ -280,7 +280,7 @@ public class Scan2 extends ScanActivity implements OnClickListener {
 
     	// Set an EditText view to get user input 
     	final EditText input = new EditText(this);
-    	input.setText("0");
+    	input.setText("");
     	alert.setView(input);
     	
     	final Scan2 myself = this;
@@ -366,53 +366,16 @@ public class Scan2 extends ScanActivity implements OnClickListener {
 			};
 			newThread.start();
 			
-			byte[] uid = dev.SearchCard(Iso15693_native.ISO15693_ACTIVATE_ADDRESSED, Iso15693_native.ISO15693_FLAG_UPLINK_RATE_HIGH, Iso15693_native.ISO15693_FLAG_NO_USE_AFI, (byte)0, Iso15693_native.ISO15693_FLAG_ONE_SLOTS, null, 0);
-			if(uid == null)
-			{
-				card_info.setText("Error search card");
-				main_info.setText("");
-				AlertDialog.Builder builder = new AlertDialog.Builder(this);
-		        builder.setTitle("请将 RFID 标签置于识别区")
-		        .setMessage("未检测到任何 RFID 标签！")
-		        .setCancelable(false)
-		        .setNegativeButton("确定",new DialogInterface.OnClickListener() {
-		            public void onClick(DialogInterface dialog, int id) {
-		                dialog.cancel();
-		            }
-		        });
-		        AlertDialog alert = builder.create();
-		        alert.show();
+			String sn = Scanner.scan();
+			if(sn == null) {
+				this.alertMessage("未找到 RFID 设备");
 				return;
 			}
-			card_info.setText("SN: 0x");
-			String sn = "";
-			for(int i = Iso15693_native.ISO15693_UID_LENGTH - 1; i >= 0; i--)
-			{
-				card_info.append(String.format("%02X", uid[i]));
-				sn = sn + String.format("%02X", uid[i]);
-			}
-			//new LongRunningGetIO(sn + "-" + this.imei, new NullCallback()).execute();
-			//this.addNewItemToList(sn);
+			
 			
 			if(fetchController == null)
 				fetchController = new FetchItemCallbackController(this, sn);
 			
-		
-			byte[] cinfo = dev.ReadCardInfo();
-			if(cinfo == null)
-			{
-				main_info.setText("Error get cardinfo, maybe card don't support");
-				return;
-			}
-			main_info.setText(String.format("AFI:					0x%x\n", cinfo[Iso15693_native.ISO15693_INFO_AT_AFI]));
-			main_info.append(String.format("DSFID:				0x%x\n", cinfo[Iso15693_native.ISO15693_INFO_AT_DSFID]));
-			main_info.append(String.format("BLOCK NUMBERS:	%d\n", cinfo[Iso15693_native.ISO15693_INFO_AT_BLOCK_NR]));
-			main_info.append(String.format("BLOCK SIZE:			%d\n", cinfo[Iso15693_native.ISO15693_INFO_AT_BLOCK_SIZE]));
-			main_info.append(String.format("IC :					0x%x\n\n", cinfo[Iso15693_native.ISO15693_INFO_AT_IC]));
-			//start_demo.setEnabled(true);
-			
-			block_max = cinfo[Iso15693_native.ISO15693_INFO_AT_BLOCK_NR];
-			block_size = cinfo[Iso15693_native.ISO15693_INFO_AT_BLOCK_SIZE];
 		}
 	}
     

@@ -16,12 +16,14 @@ import org.apache.http.protocol.BasicHttpContext;
 import org.apache.http.protocol.HttpContext;
 
 import android.os.AsyncTask;
+import android.util.Log;
 
 public class LongRunningGetIO extends AsyncTask <Void, Void, String> {
 	String url = "";
 	IOCallback callback;
 	List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>();
 	public LongRunningGetIO(String url, List<NameValuePair> values, IOCallback callback) {
+		Log.d("URL", url);
 		if(values != null) this.nameValuePairs = values;
 		this.url = url;
 		this.callback = callback;
@@ -61,6 +63,8 @@ public class LongRunningGetIO extends AsyncTask <Void, Void, String> {
 			//EditText et = (EditText)findViewById(R.id.my_edit);
 			//TextView main_info = (TextView)findViewById(R.id.textView_15693_info);
 			//main_info.setText(results);
+			results = results.replaceAll("\ufeff", "");
+			Log.d("RESULT", results);
 			callback.httpRequestDidFinish(1, results);
 		} else {
 			callback.httpRequestDidFinish(0, "ERROR");

@@ -20,9 +20,9 @@ public final class R {
         public static final int button_2ndGID_getinfo=0x7f05001a;
         public static final int button_ScanAndUpload=0x7f05000f;
         public static final int button_mifare_set=0x7f050014;
-        public static final int button_scan2=0x7f050010;
-        public static final int button_scan3=0x7f050011;
-        public static final int button_scan4=0x7f050012;
+        public static final int button_scan2=0x7f050012;
+        public static final int button_scan3=0x7f050010;
+        public static final int button_scan4=0x7f050011;
         public static final int checkBox_15693_lockafi=0x7f05000c;
         public static final int checkBox_15693_lockblock=0x7f05000b;
         public static final int checkBox_15693_lockdsfid=0x7f05000d;
@@ -102,5 +102,6 @@ public final class R {
         public static final int text_null=0x7f040007;
         public static final int text_power=0x7f04000e;
         public static final int text_serial=0x7f04000d;
+        public static final int url_prefix=0x7f040030;
     }
 }
