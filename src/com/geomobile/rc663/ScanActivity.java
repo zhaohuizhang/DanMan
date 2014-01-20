@@ -6,6 +6,11 @@ import android.content.DialogInterface;
 import android.util.Log;
 
 public class ScanActivity extends Activity {
+	@Override
+	public void onBackPressed() {
+	    this.finish();
+	}
+	
 	public void alertMessage(String msg)
     {
     	Log.d("ALERT", "alert");

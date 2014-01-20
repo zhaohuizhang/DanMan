@@ -77,22 +77,22 @@ public class RC663_RFIDActivity extends Activity implements OnClickListener {
 			Intent i = new Intent();
 			i.setClass(this, ScanAndUpload.class);
 			startActivity(i);
-			finish();
+			//finish();
 		} else if (arg0 == start_scan2) {
 			Intent i = new Intent();
 			i.setClass(this, Scan2.class);
 			startActivity(i);
-			finish();
+			//finish();
 		} else if (arg0 == start_scan3) {
 			Intent i = new Intent();
 			i.setClass(this, Scan3.class);
 			startActivity(i);
-			finish();
+			//finish();
 		} else if (arg0 == start_scan4) {
 			Intent i = new Intent();
 			i.setClass(this, Scan4.class);
 			startActivity(i);
-			finish();
+			//finish();
 		}
 	}
 }

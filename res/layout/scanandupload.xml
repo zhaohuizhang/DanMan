@@ -34,6 +34,7 @@
                 android:id="@+id/button_15693_search"
                 android:layout_width="50dp"
                 android:layout_height="50dp"
+                android:textSize="15dp"
                 android:text="扫描" />
         </LinearLayout>
     </LinearLayout>
@@ -77,6 +78,7 @@
             android:id="@+id/button_15693_upload"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:textSize="15dp"
             android:text="全部上传" />
     </LinearLayout>
 

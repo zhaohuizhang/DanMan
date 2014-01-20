@@ -2,7 +2,7 @@
 <resources>
 
     <string name="hello">Hello World, RC663_RFIDActivity!</string>
-    <string name="app_name">RC663_RFID</string>
+    <string name="app_name">废物管理</string>
     <string name="btn_in_14443a">ISO14443A</string>
     <string name="btn_in_15693">ISO15693</string>
     <string name="btn_in_2ndGID">Read China Second Generation ID card\'s UID</string>

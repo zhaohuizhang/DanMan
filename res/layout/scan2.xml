@@ -20,18 +20,22 @@
             android:scrollbars="vertical"
             android:text="修改重量" />
 
-        <LinearLayout
+        <AbsoluteLayout
             android:id="@+id/linearLayout2"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" >
+            android:layout_height="265dp" >
 
             <Button
                 android:id="@+id/button_15693_search"
-                android:layout_width="50dp"
+                android:layout_width="112dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="0.48"
-                android:text="扫描" />
-        </LinearLayout>
+                android:layout_x="68dp"
+                android:layout_y="97dp"
+                android:text="扫描"
+                android:textSize="30dp" />
+
+        </AbsoluteLayout>
 
     </LinearLayout>
 
